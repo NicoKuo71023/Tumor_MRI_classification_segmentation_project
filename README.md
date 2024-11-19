@@ -1,54 +1,101 @@
-# GamaDigit - Game Data Explorer: Market Analysis, Prediction, and Recommendation System
+# **Tumor MRI Classification and Segmentation Project Proposal**
 
-## Project Overview
+---
 
-This project aims to conduct an in-depth analysis of the global game market, with a particular focus on the dynamics and player demands in the single-player game segment, while also developing a data-driven recommendation system. With the sustained growth of the global game market, single-player games continue to hold an important place, thanks to their innovation and immersive experience. By analyzing market data, studying player behavior, and exploring game genres, this project seeks to offer valuable insights to game developers and marketing teams.
+## **1. Project Overview**
+This project aims to develop an end-to-end deep learning pipeline for tumor MRI analysis, including classification and segmentation tasks, to assist medical professionals in diagnosis. The project is divided into two primary tasks:
+- **Classification**: Predict tumor types from MRI scans (e.g., benign vs. malignant or specific tumor types).
+- **Segmentation**: Accurately delineate tumor regions in MRI images.
 
-## Project Objectives
+---
 
-- **Enhance Market Insight**: Provide developers with deep insights into player preferences and market demands.
-- **Reduce Development Risks**: Minimize the risk of commercial failure by analyzing market demands and predicting the potential of new games through a recommendation system.
-- **Increase Player Loyalty**: Boost player engagement and satisfaction by providing game recommendations tailored to player preferences.
-- **Support Market Strategies**: Offer market trend analysis to assist companies in developing effective strategies, identifying “blue ocean” markets, and avoiding “red ocean” competition.
+## **2. Methodology**
 
-## System Architecture
+### **2.1 Dataset**
+- **Sources**:
+  - Classificaiton: https://www.kaggle.com/datasets/navoneel/brain-mri-images-for-brain-tumor-detection
+  - Segmentation: https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation
+- **Data Preprocessing**:
+  - **Normalization**: Rescale pixel intensity to `[0, 1]`.
+  - **Resizing**:
+    - Classification: `128 × 128`.
+    - Segmentation: `256 × 256`.
+  - **Data Augmentation**:
+    - Geometric transformations: rotation, flipping, cropping.
+    - Intensity adjustments: contrast enhancement, Gaussian noise. (not sure)
+  - **Splitting**: Divide data into training, validation, and test sets (e.g., `70% / 15% / 15%`).
 
-- **Hardware Architecture**: Utilizes a Harvester Cluster/RKE2 (Kubernetes) setup, incorporating Elasticsearch clusters and MySQL databases.
-- **Layered Service Architecture**: Comprises a data source layer, data processing and analysis layer, business application layer, and presentation layer.
-- **Data Pipeline**: Includes data sources, data lake, and data warehouse with ETL and analysis processes, supporting computations for the recommendation system and market analysis.
+---
 
-## Recommendation System Mechanism
+### **2.2 Classification**
 
-The recommendation system operates through the following process:
+#### **2.2.1 Baseline Model**
+- **Simple CNN**:
+  - A small convolutional network to establish baseline performance.
+  - Architecture: `Conv2D → ReLU → MaxPooling → Fully Connected → Sigmoid/Softmax`.
+  - **Metrics**:
+    - Accuracy, precision, recall, and F1 score.
 
-1. Generate textual vectors for game tags and genres using TF-IDF.
-2. Calculate cosine similarity between games.
-3. Rank and recommend the top 5 games that closely match user preferences.
+#### **2.2.2 Advanced Architectures**
+- **ResNet**:
+  - Deep architectures (e.g., `ResNet-18`, `ResNet-50`) to address vanishing gradient issues.
+  - Use pretrained weights for transfer learning?
+- **Vision Transformers (ViT)**:
+  - Capture global dependencies in MRI images.
+  - Experiment with fine-tuning pretrained ViT models on medical datasets.
 
-## Market Analysis
+#### **2.2.3 Other Potential Models**
+- **DenseNet**:
+  - Efficient feature reuse for better performance.
+- **EfficientNet**:
+  - Balances accuracy and model size effectively.
 
-### Global Market Trends
+---
 
-- Market revenue is projected to continue growing, with single-player games maintaining a significant market share and growth potential.
-- Preferences lean towards specific game genres, such as action and adventure, particularly in major markets like the United States, China, and Russia.
+### **2.3 Segmentation**
 
-### Game Genre Analysis
+#### **2.3.1 Baseline Model**
+- **U-Net**:
+  - A standard architecture for medical image segmentation.
+  - Combines an encoder (downsampling) and decoder (upsampling) with skip connections.
 
-- Analyze the market performance of various game genres, tracking changes over the past 5-10 years in terms of game count, sales, and revenue.
-- Provide region-specific market recommendations, helping developers understand the particular demands in different areas.
+#### **2.3.2 Advanced Architectures**
+- **Attention U-Net**:
+  - Incorporates attention mechanisms to focus on tumor regions.
+- **DeepLabV3+**:
+  - Uses atrous spatial pyramid pooling (ASPP) for multi-scale feature extraction.
+- **Swin Transformer**:
+  - Combines the power of transformers with efficient hierarchical design.
 
-## Model Building
+#### **2.3.3 Other Potential Models**
+- **SegNet**:
+  - Encoder-decoder-based architecture for segmentation.
+- **nnU-Net**:
+  - A self-adaptive U-Net tailored for biomedical datasets.
 
-The model building for this project aims to predict a game’s first-month sales based on game features (such as tags and genres) and developer-related information. A variety of models will be compared, including linear regression, polynomial ridge regression, XGBoost, and deep neural networks (DNN), to determine the best predictive solution. The main steps in model building include:
+---
 
-1. **Feature Extraction**: Extract features from game tags, genres, developers, and other relevant data.
-2. **Data Processing and Cleaning**: Preprocess features, including normalization and encoding of categorical variables.
-3. **Model Selection and Training**: Train several machine learning models and deep learning models (Linear, Polynomial+ridge, XGBoost, DNN) to compare predictive performance.
-4. **Model Evaluation and Optimization**: Evaluate models using metrics like RMSE and R-square, and fine-tune them with hyperparameter optimization using Optuna to enhance prediction accuracy.
+### **2.4 Training Strategy**
+- **Loss Functions**:
+  - **Classification**:
+    - Binary Cross-Entropy (BCE) for binary classification.
+    - Cross-Entropy Loss for multi-class classification.
+  - **Segmentation**:
+    - Dice Loss for overlapping region precision.
+    - Binary Cross-Entropy + Dice Loss for balanced optimization.
+- **Optimizers and Learning Rate Scheduling**:
+  - Use Adam or SGD with momentum.
+  - Dynamic learning rate adjustments: ReduceLROnPlateau or Cosine Annealing.
+- **Evaluation Metrics**:
+  - **Classification**: Accuracy, precision, recall, F1 score, and ROC-AUC.
+  - **Segmentation**: Dice coefficient, Intersection over Union (IoU), and Hausdorff Distance.
 
-The ultimate goal is to establish an accurate predictive model that effectively forecasts a game’s first-month sales and provides valuable insights for game developers and marketing strategies.
+---
 
-## References
-
-- **Market Data Sources**: Gamalytic API, Bain & Company Market Reports
-- **Technical Documentation**: TF-IDF technical papers, cosine similarity calculation, and more.
+### **2.5 Tools and Frameworks**
+- **Programming Language**: Python.
+- **Deep Learning Frameworks**: PyTorch
+- **Data Augmentation**: Albumentations, MONAI (for medical imaging).
+- **Visualization Tools**:
+  - Grad-CAM: Explainability for classification models.
+  - Overlay segmentation results on MRI images.
